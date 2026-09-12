@@ -205,8 +205,15 @@ def main(page: ft.Page):
         )
 
     def toggle_tree_node(key):
-        state["tree_open"].symmetric_difference_update({key})
-        render()
+        # NOTE: wrapped in try/except so that if anything goes wrong
+        # while expanding a node, you SEE the error on screen (a
+        # snack bar) instead of the tap silently doing nothing.
+        try:
+            state["tree_open"].symmetric_difference_update({key})
+            render()
+        except Exception as ex:
+            page.snack_bar = ft.SnackBar(ft.Text(f"Tap error: {ex}"), open=True)
+            page.update()
 
     def tree_branch(key, icon, label, count, title_color_key, header_bg_key, children_builder):
         """One collapsible node in the ancestor-style tree: an
