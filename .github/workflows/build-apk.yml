@@ -25,6 +25,7 @@ jobs:
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: "stable"
+          cache: false
       - name: Disable Flutter analytics
         run: flutter config --no-analytics
       - name: Install Python dependencies
