@@ -227,19 +227,21 @@ def main(page: ft.Page):
         is_open = key in state["tree_open"]
         arrow = "▼" if is_open else "▶"
         header = ft.Container(
-            content=ft.Row(
-                [
-                    ft.Text(arrow, color=color("accent"), size=13),
-                    ft.Text(f"{icon} {label} ({count})", color=color(title_color_key),
-                             weight=ft.FontWeight.BOLD, font_family="Cormorant", size=16),
-                ],
-                spacing=6,
+            content=ft.TextButton(
+                content=ft.Row(
+                    [
+                        ft.Text(arrow, color=color("accent"), size=13),
+                        ft.Text(f"{icon} {label} ({count})", color=color(title_color_key),
+                                 weight=ft.FontWeight.BOLD, font_family="Cormorant", size=16),
+                    ],
+                    spacing=6,
+                ),
+                on_click=lambda e: toggle_tree_node(key),
+                style=ft.ButtonStyle(padding=0),
             ),
             bgcolor=color(header_bg_key),
             border_radius=6,
             padding=ft.padding.symmetric(vertical=6, horizontal=8),
-            on_click=lambda e: toggle_tree_node(key),
-            ink=True,
         )
         if not is_open:
             return header
