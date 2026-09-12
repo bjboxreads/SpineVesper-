@@ -22,7 +22,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 LIBRARY_FILE = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
-    "storyspire_library.csv",
+    "storySpire_library.csv",
 )
 LIBRARY_BACKUP_FILE = LIBRARY_FILE + ".bak"
 
