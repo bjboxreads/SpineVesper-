@@ -205,9 +205,13 @@ def main(page: ft.Page):
         )
 
     def toggle_tree_node(key):
-        # NOTE: wrapped in try/except so that if anything goes wrong
-        # while expanding a node, you SEE the error on screen (a
-        # snack bar) instead of the tap silently doing nothing.
+        # DIAGNOSTIC: this snackbar fires the instant a tap is
+        # received, BEFORE anything else runs. If you tap an author
+        # and never see "Tapped: ..." pop up, the tap isn't reaching
+        # this function at all -- the bug is in how the header
+        # Container is wired up, not in this function's logic.
+        page.snack_bar = ft.SnackBar(ft.Text(f"Tapped: {key}"), open=True)
+        page.update()
         try:
             state["tree_open"].symmetric_difference_update({key})
             render()
