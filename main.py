@@ -52,7 +52,7 @@ def main(page: ft.Page):
         "fetch_message": None,  # (type, text)
     }
 
-    body = ft.Column()
+    body = ft.Column(scroll=ft.ScrollMode.AUTO, expand=True)
 
     def T():
         return data.THEMES[state["theme_name"]]
@@ -205,19 +205,8 @@ def main(page: ft.Page):
         )
 
     def toggle_tree_node(key):
-        # DIAGNOSTIC: this snackbar fires the instant a tap is
-        # received, BEFORE anything else runs. If you tap an author
-        # and never see "Tapped: ..." pop up, the tap isn't reaching
-        # this function at all -- the bug is in how the header
-        # Container is wired up, not in this function's logic.
-        page.snack_bar = ft.SnackBar(ft.Text(f"Tapped: {key}"), open=True)
-        page.update()
-        try:
-            state["tree_open"].symmetric_difference_update({key})
-            render()
-        except Exception as ex:
-            page.snack_bar = ft.SnackBar(ft.Text(f"Tap error: {ex}"), open=True)
-            page.update()
+        state["tree_open"].symmetric_difference_update({key})
+        render()
 
     def tree_branch(key, icon, label, count, title_color_key, header_bg_key, children_builder):
         """One collapsible node in the ancestor-style tree: an
@@ -251,10 +240,9 @@ def main(page: ft.Page):
                 ft.Row(
                     [
                         ft.Container(width=2, bgcolor=color("line")),
-                        ft.Column(children_builder(), spacing=6, expand=True),
+                        ft.Column(children_builder(), spacing=6),
                     ],
                     spacing=10,
-                    vertical_alignment=ft.CrossAxisAlignment.STRETCH,
                 ),
             ],
             spacing=0,
@@ -276,16 +264,6 @@ def main(page: ft.Page):
                 )
                 for idx, book in series_items
             ]
-            # A big series expanding into a plain, unbounded Column
-            # means every book card (cover image included) gets built
-            # and laid out in one synchronous pass -- fine for a
-            # handful of books, but this is what freezes/crashes the
-            # app on a large series. ListView only builds and paints
-            # what's actually on screen, so cost stays flat instead
-            # of scaling with series size. Small series are left as
-            # plain rows so their look/behavior doesn't change.
-            if len(rows) > 8:
-                return [ft.ListView(controls=rows, spacing=6, height=480)]
             return rows
 
         return tree_branch(key, "📂", label, len(series_items), "text", "surface2", build_children)
@@ -326,9 +304,12 @@ def main(page: ft.Page):
         return ft.Column(tiles, spacing=8)
 
     def lettered_grid_tree(books_with_idx, group_by):
-        """Book Spire tab — same grouping, but with A/B/C letter
-        dividers and tiles laid out in a wrapping grid, matching
-        the Streamlit tree view."""
+        """Book Spire tab — same grouping, laid out as a single
+        vertical column of author tiles under A/B/C letter
+        dividers. (Previously used a wrapping Row grid, but
+        combining expand=True children inside a wrap=True Row
+        is an unstable Flutter layout combination on mobile and
+        was causing the tree to stop rendering partway through.)"""
         groups = group_items(books_with_idx, group_by)
         icon = "🏷️" if group_by == "Genre" else "🗼"
         sorted_names = sorted(groups.keys(), key=lambda x: str(x).lower())
@@ -358,11 +339,8 @@ def main(page: ft.Page):
                     spacing=10,
                 )
             )
-            tiles = [
-                ft.Container(author_tile(name, groups[name], icon), width=320)
-                for name in names
-            ]
-            sections.append(ft.Row(tiles, wrap=True, spacing=14, run_spacing=14))
+            for name in names:
+                sections.append(author_tile(name, groups[name], icon))
 
         return ft.Column(sections, spacing=10)
 
@@ -961,16 +939,32 @@ def main(page: ft.Page):
         page.bgcolor = color("page")
 
         tab = state["tab"]
-        if tab == "tree":
-            content = tree_tab()
-        elif tab == "books":
-            content = books_tab()
-        elif tab == "add":
-            content = add_tab()
-        elif tab == "manage":
-            content = manage_tab()
-        else:
-            content = import_tab()
+        try:
+            if tab == "tree":
+                content = tree_tab()
+            elif tab == "books":
+                content = books_tab()
+            elif tab == "add":
+                content = add_tab()
+            elif tab == "manage":
+                content = manage_tab()
+            else:
+                content = import_tab()
+        except Exception as ex:
+            # A tab crashing used to leave the whole screen blank
+            # with nothing else rendered below it and no way back.
+            # Surfacing the error as content instead means there's
+            # always at least the nav bar to tap back to another
+            # tab, and the actual exception is visible instead of
+            # silently vanishing.
+            content = ft.Column(
+                [
+                    ft.Text("Something went wrong loading this screen.",
+                             color=ft.Colors.RED_300, weight=ft.FontWeight.BOLD),
+                    ft.Text(f"{type(ex).__name__}: {ex}", color=ft.Colors.RED_200, selectable=True),
+                ],
+                spacing=8,
+            )
 
         body.controls = [
             ft.Container(
@@ -998,7 +992,7 @@ def main(page: ft.Page):
         ]
         page.update()
 
-    page.add(ft.SafeArea(content=body))
+    page.add(ft.SafeArea(content=body, expand=True))
     render()
 
 
