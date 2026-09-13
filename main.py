@@ -1,5 +1,5 @@
 """
-SpineVesper — Flet version, pandas-free.
+StoryStrand — Flet version, pandas-free.
 
 Run locally:      flet run main.py
 Build the APK:     flet build apk
@@ -8,8 +8,8 @@ Build the APK:     flet build apk
 import flet as ft
 import data
 
-APP_TITLE = "SpineVesper"
-APP_TAGLINE = "a library that rises one story at a time"
+APP_TITLE = "StoryStrand"
+APP_TAGLINE = "a library that grows one story at a time"
 
 STAT_FILTER_MAP = {
     "Books": "All",
@@ -20,7 +20,7 @@ STAT_FILTER_MAP = {
 STAT_TAB_MAP = {"Authors": "tree", "Series": "tree"}
 
 NAV_ITEMS = [
-    ("tree", "SpineVesper"),
+    ("tree", "StoryStrand"),
     ("books", "📚 Books"),
     ("add", "➕ Add Book"),
     ("manage", "✏️ Edit / Delete"),
@@ -296,7 +296,7 @@ def main(page: ft.Page):
     def simple_grouped_list(books_with_idx, group_by):
         """Books tab — flat single-column Author/Genre -> Series -> books."""
         groups = group_items(books_with_idx, group_by)
-        icon = "🏷️" if group_by == "Genre" else "🗼"
+        icon = "🏷️" if group_by == "Genre" else "🌿"
         tiles = [
             author_tile(name, groups[name], icon)
             for name in sorted(groups.keys(), key=lambda x: str(x).lower())
@@ -304,14 +304,14 @@ def main(page: ft.Page):
         return ft.Column(tiles, spacing=8)
 
     def lettered_grid_tree(books_with_idx, group_by):
-        """Book Spire tab — same grouping, laid out as a single
+        """Book Strand tab — same grouping, laid out as a single
         vertical column of author tiles under A/B/C letter
         dividers. (Previously used a wrapping Row grid, but
         combining expand=True children inside a wrap=True Row
         is an unstable Flutter layout combination on mobile and
         was causing the tree to stop rendering partway through.)"""
         groups = group_items(books_with_idx, group_by)
-        icon = "🏷️" if group_by == "Genre" else "🗼"
+        icon = "🏷️" if group_by == "Genre" else "🌿"
         sorted_names = sorted(groups.keys(), key=lambda x: str(x).lower())
 
         letter_blocks = []
@@ -420,7 +420,7 @@ def main(page: ft.Page):
         )
         page.open(dlg)
 
-    # ---------------- TREE (Book Spire) TAB ----------------
+    # ---------------- TREE (Book Strand) TAB ----------------
 
     def tree_tab():
         search_f = ft.TextField(
@@ -457,13 +457,13 @@ def main(page: ft.Page):
             state["tree_group"] = group_by_group.value
 
             root_label_text.value = {
-                "All Books": "🗼 MY LIBRARY", "Read": "🗼 MY READ BOOKS", "Unread": "🗼 MY UNREAD BOOKS",
+                "All Books": "🌿 MY LIBRARY", "Read": "🌿 MY READ BOOKS", "Unread": "🌿 MY UNREAD BOOKS",
             }[state["tree_status"]]
 
             lib = state["library"]
             if not lib:
                 results.controls = [ft.Text(
-                    "Your spire is just a foundation — import your library or add your first book to help it rise.",
+                    "Your strand hasn't started yet — import your library or add your first book to begin weaving it.",
                     color=color("muted"))]
                 page.update()
                 return
@@ -483,7 +483,7 @@ def main(page: ft.Page):
                 items = [(i, b) for i, b in items if search_matches(b, q)]
 
             root_label_text.value = {
-                "All Books": "🗼 MY LIBRARY", "Read": "🗼 MY READ BOOKS", "Unread": "🗼 MY UNREAD BOOKS",
+                "All Books": "🌿 MY LIBRARY", "Read": "🌿 MY READ BOOKS", "Unread": "🌿 MY UNREAD BOOKS",
             }[state["tree_status"]]
 
             if not items:
@@ -502,7 +502,7 @@ def main(page: ft.Page):
 
         return ft.Column(
             [
-                ft.Text("Search My Spire", size=18, color=color("accent"), font_family="Cormorant"),
+                ft.Text("Search My Strand", size=18, color=color("accent"), font_family="Cormorant"),
                 search_f,
                 ft.Text("Show", size=12, color=color("muted")),
                 status_group,
@@ -725,7 +725,7 @@ def main(page: ft.Page):
             state["library"].append(new_book)
             data.save_library(state["library"])
 
-            status_text.value = f'"{new_book["Title"]}" was added to your spire!'
+            status_text.value = f'"{new_book["Title"]}" was added to your strand!'
             status_text.color = color("accent2")
             for f in (title_f, author_f, series_f, number_f, genre_f, tags_f, isbn_f):
                 f.value = ""
@@ -742,7 +742,7 @@ def main(page: ft.Page):
                 ft.Text("Rating", size=12, color=color("muted")),
                 stars_row,
                 fav_f,
-                ft.FilledButton("Add to My Spire", on_click=submit),
+                ft.FilledButton("Add to My Strand", on_click=submit),
                 status_text,
             ],
             spacing=12,
@@ -928,7 +928,7 @@ def main(page: ft.Page):
                     "fetched later from the Books tab.",
                     size=11, color=color("muted"),
                 ),
-                ft.FilledButton("🗼 Raise My Spire", on_click=do_import),
+                ft.FilledButton("🌿 Grow My Strand", on_click=do_import),
             ],
             spacing=10,
         )
