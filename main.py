@@ -1,5 +1,5 @@
 """
-StoryStrand — Flet version, pandas-free.
+SpineVesper — Flet version, pandas-free.
 
 Run locally:      flet run main.py
 Build the APK:     flet build apk
@@ -8,7 +8,7 @@ Build the APK:     flet build apk
 import flet as ft
 import data
 
-APP_TITLE = "StoryStrand"
+APP_TITLE = "SpineVesper"
 APP_TAGLINE = "a library that rises one story at a time"
 
 STAT_FILTER_MAP = {
@@ -20,7 +20,7 @@ STAT_FILTER_MAP = {
 STAT_TAB_MAP = {"Authors": "tree", "Series": "tree"}
 
 NAV_ITEMS = [
-    ("tree", "StoryStrand"),
+    ("tree", "SpineVesper"),
     ("books", "📚 Books"),
     ("add", "➕ Add Book"),
     ("manage", "✏️ Edit / Delete"),
@@ -304,7 +304,7 @@ def main(page: ft.Page):
         return ft.Column(tiles, spacing=8)
 
     def lettered_grid_tree(books_with_idx, group_by):
-        """StoryStrand tab — same grouping, laid out as a single
+        """Book Spire tab — same grouping, laid out as a single
         vertical column of author tiles under A/B/C letter
         dividers. (Previously used a wrapping Row grid, but
         combining expand=True children inside a wrap=True Row
